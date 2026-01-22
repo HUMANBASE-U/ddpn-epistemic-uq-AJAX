@@ -18,7 +18,7 @@ class DoublePoissonBayesianNN(DoublePoissonNN):
         super().__init__(**kwargs)
         self.save_hyperparameters()
         
-        # 1. Disable automatic optimization to let 'posteriors' handle updates
+        # Disable automatic optimization to let Posteriors' handle updates
         self.automatic_optimization = False
         
         self.num_mc_samples = num_mc_samples
@@ -79,7 +79,7 @@ class DoublePoissonBayesianNN(DoublePoissonNN):
         pass
 
     @abstractmethod
-    def init_posterior(self, train_loader):
+    def init_posterior(self):
         """
         Subclasses must define the 'posteriors' transform (VI, Laplace, etc.)
         and initialize self.posterior_state here.
