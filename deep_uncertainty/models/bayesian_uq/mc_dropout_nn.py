@@ -4,7 +4,7 @@ from typing import Dict, Tuple, Type
 from deep_uncertainty.models.backbones import Backbone
 from deep_uncertainty.models.double_poisson_nn import DoublePoissonNN
 
-
+#New MLP backbone supports dropout
 class MLPDropoutBackbone(Backbone):
     def __init__(self, input_dim: int = 1, output_dim: int = 64, p: float = 0.2, freeze_backbone: bool = False):
         super().__init__(output_dim=output_dim, freeze_backbone=freeze_backbone)
