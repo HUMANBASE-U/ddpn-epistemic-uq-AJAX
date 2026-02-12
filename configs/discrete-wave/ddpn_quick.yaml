@@ -1,0 +1,22 @@
+experiment_name: ddpn_quick
+random_seed: 1998
+head_type: double_poisson
+dataset:
+  type: tabular
+  spec: data/discrete-wave/discrete_sine_wave.npz
+  input_dim: 1
+training:
+  accelerator: cpu
+  batch_size: 64
+  chkp_dir: chkp/discrete-wave
+  chkp_freq: 1
+  num_epochs: 5
+  optimizer:
+    type: adam_w
+    kwargs:
+      lr: 0.001
+      weight_decay: 0.00001
+evaluation:
+  num_trials: 1
+  log_dir: logs/discrete-wave
+

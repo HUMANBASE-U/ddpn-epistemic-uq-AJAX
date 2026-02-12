@@ -36,6 +36,7 @@ def main(config: TrainingConfig):
             log_every_n_steps=5,
             check_val_every_n_epoch=math.ceil(config.num_epochs / 200),
             enable_model_summary=False,
+            enable_progress_bar=False,
             callbacks=chkp_callbacks,
             logger=logger,
             precision=config.precision,

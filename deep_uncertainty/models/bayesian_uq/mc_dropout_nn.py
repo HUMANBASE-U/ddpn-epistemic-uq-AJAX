@@ -1,27 +1,40 @@
+from typing import Dict, Tuple
+
 import torch
-from typing import Dict, Tuple, Type
+import torch.nn.functional as F
 
 from deep_uncertainty.models.backbones import Backbone
 from deep_uncertainty.models.double_poisson_nn import DoublePoissonNN
 
-#New MLP backbone supports dropout
+
+# MLP backbone that is *checkpoint-compatible* with `deep_uncertainty.models.backbones.MLP`.
+#
+# Key idea:
+# - Keep the exact same `self.layers = nn.Sequential(...)` module structure as the original MLP
+#   so checkpoints trained with the original MLP can be loaded into this backbone.
+# - Apply dropout *functionally* after each ReLU when the module is in train mode.
 class MLPDropoutBackbone(Backbone):
     def __init__(self, input_dim: int = 1, output_dim: int = 64, p: float = 0.2, freeze_backbone: bool = False):
         super().__init__(output_dim=output_dim, freeze_backbone=freeze_backbone)
+        self.p = float(p)
         self.layers = torch.nn.Sequential(
             torch.nn.Linear(input_dim, 128),
             torch.nn.ReLU(),
-            torch.nn.Dropout(p),
             torch.nn.Linear(128, 128),
             torch.nn.ReLU(),
-            torch.nn.Dropout(p),
+            torch.nn.Linear(128, 128),
+            torch.nn.ReLU(),
             torch.nn.Linear(128, output_dim),
             torch.nn.ReLU(),
-            torch.nn.Dropout(p),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.layers(x)
+        h = x
+        for layer in self.layers:
+            h = layer(h)
+            if isinstance(layer, torch.nn.ReLU):
+                h = F.dropout(h, p=self.p, training=self.training)
+        return h
 
 
 class MCDropoutDoublePoissonNN(DoublePoissonNN):# automatic_optimization=True
@@ -36,6 +49,7 @@ class MCDropoutDoublePoissonNN(DoublePoissonNN):# automatic_optimization=True
         self.num_mc_samples = num_mc_samples
         self.clamp_logmu = clamp_logmu
         self.clamp_logphi = clamp_logphi
+        self.save_hyperparameters()
 
 
     #out_put here
