@@ -13,6 +13,7 @@ class HeadType(Enum):
     LOG_GAUSSIAN = "log_gaussian"
     POISSON = "poisson"
     DOUBLE_POISSON = "double_poisson"
+    MC_DROPOUT_DOUBLE_POISSON = "mc_dropout_double_poisson"
     NEGATIVE_BINOMIAL = "negative_binomial"
     POISSON_GLM = "poisson_glm"
     NEGATIVE_BINOMIAL_GLM = "negative_binomial_glm"

@@ -43,6 +43,10 @@ class TrainingConfig:
         hidden_dim (int, optional): Feature dimension used in the model (before feeding the representation to the output head). Defaults to 64.
         random_seed (int | None, optional): If specified, the random seed to use for reproducibility. Defaults to None.
         freeze_backbone (bool, optional): If True, freeze the backbone during training. Defaults to False.
+        num_mc_samples (int, optional): Number of MC samples for MC Dropout inference. Defaults to 50.
+        dropout_p (float, optional): Dropout probability for MC Dropout backbone. Defaults to 0.2.
+        clamp_logmu (tuple, optional): Clamping range for log(mu) in MC Dropout. Defaults to (-6.0, 5.0).
+        clamp_logphi (tuple, optional): Clamping range for log(phi) in MC Dropout. Defaults to (-3.0, 3.0).
     """
 
     def __init__(
@@ -70,7 +74,11 @@ class TrainingConfig:
         hidden_dim: int = 64,
         precision: str | None = None,
         random_seed: int | None = None,
-        freeze_backbone: bool = False
+        freeze_backbone: bool = False,
+        num_mc_samples: int = 50,
+        dropout_p: float = 0.2,
+        clamp_logmu: tuple = (-6.0, 5.0),
+        clamp_logphi: tuple = (-3.0, 3.0),
     ):
         self.experiment_name = experiment_name
         self.accelerator_type = accelerator_type
@@ -96,6 +104,10 @@ class TrainingConfig:
         self.precision = precision
         self.random_seed = random_seed
         self.freeze_backbone = freeze_backbone
+        self.num_mc_samples = num_mc_samples
+        self.dropout_p = dropout_p
+        self.clamp_logmu = clamp_logmu
+        self.clamp_logphi = clamp_logphi
 
     @staticmethod
     def from_yaml(config_path: str | Path) -> TrainingConfig:
@@ -154,6 +166,12 @@ class TrainingConfig:
         random_seed = config_dict.get("random_seed")
         freeze_backbone = config_dict['training'].get("freeze_backbone", False)
 
+        # MC Dropout specific parameters
+        num_mc_samples = config_dict.get("num_mc_samples", 50)
+        dropout_p = config_dict.get("dropout_p", 0.2)
+        clamp_logmu = tuple(config_dict.get("clamp_logmu", [-6.0, 5.0]))
+        clamp_logphi = tuple(config_dict.get("clamp_logphi", [-3.0, 3.0]))
+
         return TrainingConfig(
             experiment_name=experiment_name,
             accelerator_type=accelerator_type,
@@ -178,7 +196,11 @@ class TrainingConfig:
             hidden_dim=hidden_dim,
             precision=precision,
             random_seed=random_seed,
-            freeze_backbone=freeze_backbone
+            freeze_backbone=freeze_backbone,
+            num_mc_samples=num_mc_samples,
+            dropout_p=dropout_p,
+            clamp_logmu=clamp_logmu,
+            clamp_logphi=clamp_logphi,
         )
 
     def to_yaml(self, filepath: str | Path):

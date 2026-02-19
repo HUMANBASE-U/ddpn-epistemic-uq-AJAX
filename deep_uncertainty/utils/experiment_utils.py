@@ -26,6 +26,8 @@ from deep_uncertainty.models import LogGaussianNN
 from deep_uncertainty.models import NaturalGaussianNN
 from deep_uncertainty.models import NegBinomNN
 from deep_uncertainty.models import PoissonNN
+from deep_uncertainty.models.bayesian_uq.mc_dropout_nn import MCDropoutDoublePoissonNN
+from deep_uncertainty.models.bayesian_uq.mc_dropout_nn import MLPDropoutBackbone
 from deep_uncertainty.models.backbones import DistilBert
 from deep_uncertainty.models.backbones import Identity
 from deep_uncertainty.models.backbones import MLP
@@ -77,6 +79,13 @@ def get_model(config: TrainingConfig, return_initializer: bool = False) -> Discr
             )
         else:
             initializer = DoublePoissonNN
+    elif config.head_type == HeadType.MC_DROPOUT_DOUBLE_POISSON:
+        initializer = partialclass(
+            MCDropoutDoublePoissonNN,
+            num_mc_samples=getattr(config, "num_mc_samples", 50),
+            clamp_logmu=tuple(getattr(config, "clamp_logmu", (-6.0, 5.0))),
+            clamp_logphi=tuple(getattr(config, "clamp_logphi", (-3.0, 3.0))),
+        )
     elif config.head_type == HeadType.DOUBLE_POISSON_GLM:
         if config.beta_scheduler_type is not None:
             initializer = partialclass(
@@ -96,11 +105,19 @@ def get_model(config: TrainingConfig, return_initializer: bool = False) -> Discr
             HeadType.DOUBLE_POISSON_GLM,
         ):
             backbone_type = Identity
+            backbone_kwargs = {"input_dim": config.input_dim}
+        elif config.head_type == HeadType.MC_DROPOUT_DOUBLE_POISSON:
+            backbone_type = MLPDropoutBackbone
+            backbone_kwargs = {
+                "input_dim": config.input_dim,
+                "p": getattr(config, "dropout_p", 0.2),
+            }
         elif "isolated" in str(config.dataset_spec):
             backbone_type = SmallerMLP
+            backbone_kwargs = {"input_dim": config.input_dim}
         else:
             backbone_type = MLP
-        backbone_kwargs = {"input_dim": config.input_dim}
+            backbone_kwargs = {"input_dim": config.input_dim}
     elif config.dataset_type == DatasetType.TEXT:
         backbone_type = DistilBert
         backbone_kwargs = {}

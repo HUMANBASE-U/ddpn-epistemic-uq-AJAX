@@ -1,0 +1,35 @@
+experiment_name: mc_dropout_double_poisson
+random_seed: 1998
+head_type: mc_dropout_double_poisson
+dataset:
+  type: tabular
+  # For Trinity server, use: ../ryan_vance/length-of-stay/length_of_stay.npz
+  # For local testing, use: data/length-of-stay/length_of_stay.npz
+  spec: ../ryan_vance/length-of-stay/length_of_stay.npz
+  input_dim: 35
+# MC Dropout specific parameters
+num_mc_samples: 50
+dropout_p: 0.2
+clamp_logmu: [-6.0, 5.0]
+clamp_logphi: [-3.0, 3.0]
+training:
+  # Use "gpu" on Trinity; use "cpu" for local run without GPU
+  accelerator: cpu
+  batch_size: 128
+  chkp_dir: chkp/length-of-stay
+  chkp_freq: 15
+  num_epochs: 15
+  optimizer:
+    type: adam_w
+    kwargs:
+      lr: 0.0001
+      weight_decay: 0.0001
+  lr_scheduler:
+    type: cosine_annealing
+    kwargs:
+      T_max: 15
+      eta_min: 0
+      last_epoch: -1
+evaluation:
+  num_trials: 5
+  log_dir: logs/length-of-stay

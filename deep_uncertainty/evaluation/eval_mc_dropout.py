@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import yaml
 
-from deep_uncertainty.enums import DatasetType, OptimizerType
+from deep_uncertainty.enums import DatasetType, HeadType, OptimizerType
 from deep_uncertainty.datamodules.tabular_datamodule import TabularDataModule
 from deep_uncertainty.models.bayesian_uq.mc_dropout_nn import MCDropoutDoublePoissonNN
 from deep_uncertainty.models.bayesian_uq.mc_dropout_nn import MLPDropoutBackbone
@@ -145,8 +145,8 @@ def main(log_dir: Path, config_path: Path, chkp_path: Path, num_mc_samples: int,
         raise NotImplementedError(
             "eval_mc_dropout.py currently supports TABULAR datasets only (needs 2D tensor x)."
         )
-    if config.head_type.value != "double_poisson":
-        raise NotImplementedError("eval_mc_dropout.py currently supports head_type: double_poisson only.")
+    if config.head_type not in (HeadType.DOUBLE_POISSON, HeadType.MC_DROPOUT_DOUBLE_POISSON):
+        raise NotImplementedError("eval_mc_dropout.py currently supports head_type: double_poisson or mc_dropout_double_poisson only.")
 
     datamodule = TabularDataModule(
         dataset_path=config.dataset_spec,
