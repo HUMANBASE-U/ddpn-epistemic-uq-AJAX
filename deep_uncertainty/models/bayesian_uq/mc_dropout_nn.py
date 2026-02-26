@@ -41,8 +41,8 @@ class MCDropoutDoublePoissonNN(DoublePoissonNN):# automatic_optimization=True
     def __init__(
         self,
         num_mc_samples: int = 50,           #50 experts
-        clamp_logmu: Tuple[float, float] = (-6.0, 5.0),
-        clamp_logphi: Tuple[float, float] = (-3.0, 3.0),
+        clamp_logmu: Tuple[float, float] = (-20.0, 20.0),
+        clamp_logphi: Tuple[float, float] = (-20.0, 20.0),
         **kwargs,
     ):
         super().__init__(**kwargs)

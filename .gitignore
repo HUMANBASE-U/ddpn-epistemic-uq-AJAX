@@ -9,3 +9,5 @@ __pycache__
 chkp/*
 /ignore/
 *.log
+*.png
+*.npz

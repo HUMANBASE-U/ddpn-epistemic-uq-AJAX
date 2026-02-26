@@ -26,6 +26,7 @@ from deep_uncertainty.models import LogGaussianNN
 from deep_uncertainty.models import NaturalGaussianNN
 from deep_uncertainty.models import NegBinomNN
 from deep_uncertainty.models import PoissonNN
+from deep_uncertainty.models.bayesian_uq.sgmcmc_nn import SGMCMCDoublePoissonNN
 from deep_uncertainty.models.bayesian_uq.mc_dropout_nn import MCDropoutDoublePoissonNN
 from deep_uncertainty.models.bayesian_uq.mc_dropout_nn import MLPDropoutBackbone
 from deep_uncertainty.models.backbones import DistilBert
@@ -82,9 +83,8 @@ def get_model(config: TrainingConfig, return_initializer: bool = False) -> Discr
     elif config.head_type == HeadType.MC_DROPOUT_DOUBLE_POISSON:
         initializer = partialclass(
             MCDropoutDoublePoissonNN,
-            num_mc_samples=getattr(config, "num_mc_samples", 50),
-            clamp_logmu=tuple(getattr(config, "clamp_logmu", (-6.0, 5.0))),
-            clamp_logphi=tuple(getattr(config, "clamp_logphi", (-3.0, 3.0))),
+            num_mc_samples=config.num_mc_samples
+
         )
     elif config.head_type == HeadType.DOUBLE_POISSON_GLM:
         if config.beta_scheduler_type is not None:
@@ -110,7 +110,7 @@ def get_model(config: TrainingConfig, return_initializer: bool = False) -> Discr
             backbone_type = MLPDropoutBackbone
             backbone_kwargs = {
                 "input_dim": config.input_dim,
-                "p": getattr(config, "dropout_p", 0.2),
+                "p": config.dropout_p,
             }
         elif "isolated" in str(config.dataset_spec):
             backbone_type = SmallerMLP
