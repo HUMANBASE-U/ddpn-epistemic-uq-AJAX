@@ -5,7 +5,7 @@ dataset:
   type: tabular
   # For Trinity server, use: ../ryan_vance/length-of-stay/length_of_stay.npz
   # For local testing, use: data/length-of-stay/length_of_stay.npz
-  spec: ../ryan_vance/length-of-stay/length_of_stay.npz
+  spec: /home/ra-ugrad/ryan_vance/length-of-stay/length_of_stay.npz
   input_dim: 35
 # MC Dropout specific parameters
 num_mc_samples: 50
