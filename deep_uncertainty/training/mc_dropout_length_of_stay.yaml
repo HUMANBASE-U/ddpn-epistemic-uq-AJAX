@@ -14,7 +14,7 @@ clamp_logmu: [-6.0, 5.0]
 clamp_logphi: [-3.0, 3.0]
 training:
   # Use "gpu" on Trinity; use "cpu" for local run without GPU
-  accelerator: cpu
+  accelerator: gpu
   batch_size: 128
   chkp_dir: chkp/length-of-stay
   chkp_freq: 15
