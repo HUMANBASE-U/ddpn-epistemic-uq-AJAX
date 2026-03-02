@@ -26,7 +26,7 @@ def main(log_dir: Path, config_path: Path, chkp_path: Path):
     )
 
     initializer: Type[DiscreteRegressionNN] = get_model(config, return_initializer=True)[1]
-    model = initializer.load_from_checkpoint(chkp_path)
+    model = initializer.load_from_checkpoint(chkp_path, weights_only=False)
     evaluator = L.Trainer(
         accelerator=config.accelerator_type.value,
         enable_model_summary=False,
