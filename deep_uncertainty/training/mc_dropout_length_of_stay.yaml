@@ -31,5 +31,5 @@ training:
       eta_min: 0
       last_epoch: -1
 evaluation:
-  num_trials: 5
+  num_trials: 1
   log_dir: logs/length-of-stay
